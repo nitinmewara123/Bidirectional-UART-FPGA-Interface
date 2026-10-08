@@ -9,7 +9,8 @@ module top (
     output reg [7:0] led         // 8 Physical LEDs
 );
 
-    wire tick;
+    wire t_tick;       // 1x baud tick for transmitter
+    wire r_tick;       // 16x baud tick for receiver oversampling
     wire rx_done;
     wire [7:0] rx_data_out;
     wire tx_ready;
@@ -36,18 +37,27 @@ module top (
 
     // --- INSTANTIATE MODULES ---
     baud_gen #(.CLK_FREQ(100000000), .BAUD_RATE(115200)) u_baud (
-        .clk(clk), .reset(reset), .tx_tick(tick)
+        .clk(clk), 
+        .reset(reset), 
+        .tx_tick(t_tick),    // Outputs 1x tick
+        .rx_tick(r_tick)     // Outputs 16x tick
     );
 
     uart_rx u_rx (
-        .clk(clk), .reset(reset), .rx(rx), .rx_tick(tick),
-        .data_out(rx_data_out), .rx_done(rx_done)
+        .clk(clk), 
+        .reset(reset), 
+        .rx(rx), 
+        .rx_tick(r_tick),    // Feeds the 16x tick to RX for oversampling
+        .data_out(rx_data_out), 
+        .rx_done(rx_done)
     );
 
     uart_tx u_tx (
-        .clk(clk), .reset(reset), .tx_tick(tick),
-        .tx_start(send_pulse),   // Start TX when the Top Button is pressed
-        .data_in(sw),            // Grab data directly from the 8 switches
+        .clk(clk), 
+        .reset(reset), 
+        .tx_tick(t_tick),    // Feeds the standard 1x tick to TX
+        .wr_enb(send_pulse), // Start TX when the Top Button is pressed
+        .data_in(sw),        // Grab data directly from the 8 switches
         .tx(tx),
         .tx_ready(tx_ready)
     );
