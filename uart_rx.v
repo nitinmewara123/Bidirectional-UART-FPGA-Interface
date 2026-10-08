@@ -3,7 +3,7 @@ module uart_rx (
     input wire clk,
     input wire reset,
     input wire rx,             
-    input wire rx_tick,        // Now expects a 16x baud tick
+    input wire rx_tick, 
     output reg [7:0] data_out, 
     output reg rx_done         
 );
