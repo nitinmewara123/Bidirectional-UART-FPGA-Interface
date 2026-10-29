@@ -12,8 +12,8 @@ module baud_gen #(
     localparam TX_MAX = CLK_FREQ / BAUD_RATE;
     localparam RX_MAX = CLK_FREQ / (BAUD_RATE * 16);
 
-    reg [31:0] tx_reg;
-    reg [31:0] rx_reg;
+    reg [$clog2(TX_MAX):0] tx_reg;
+    reg [$clog2(RX_MAX):0] rx_reg;
 
     assign tx_tick = (tx_reg == TX_MAX - 1);
     assign rx_tick = (rx_reg == RX_MAX - 1);
@@ -28,3 +28,5 @@ module baud_gen #(
         end
     end
 endmodule
+
+
